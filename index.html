@@ -5,6 +5,7 @@
 	<script type="text/javascript" src="lib/kdtree.js"></script>
 	<script type="text/javascript" src="lib/simulator.js"></script>
 	<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
+	<script type="text/javascript" src="lib/webgazer.js">
 	<title>Simulator</title>
 
 	<style type="text/css">
@@ -62,6 +63,12 @@
 		</p>
 	</div>
 
+	<div id="TurkFormDiv">
+		<form url="https://workersandbox.mturk.com/mturk/externalSubmit" method="POST">
+			<input type = "hidden" id="Flag" value="HelloWorld">
+		</form>
+	</div>
+
 	<div class="clearfix"></div>
 
 	<a href="http://guidogarcia.net">guidogarcia.net</a> - <a href="https://github.com/palmerabollo/rvo2-js">rvo2-js project at github</a>
@@ -72,6 +79,24 @@
 		var target = 0
 		var testFlag = false;
 		var clicks = 0;
+
+		function getUrlVars() {
+    	var vars = {};
+    	var parts = window.location.href.replace(/[?&]+([^=&]+)=([^&]*)/gi, function(m,key,value) {
+        vars[key] = value;
+    	});
+    	return vars;
+		}
+
+		var getUrlParam = function(parameter, defaultvalue)
+		{
+	    var urlparameter = defaultvalue;
+	    if(window.location.href.indexOf(parameter) > -1)
+			{
+        urlparameter = getUrlVars()[parameter];
+      }
+	    return urlparameter;
+		}
 
 		var Board = function() {
 			var canvas = document.getElementById('board');
@@ -162,7 +187,7 @@
 					10.0, // max speed
 					velocity // default velocity
 				);
-			var NUM_AGENTS = $("#agents").val();
+			var NUM_AGENTS = parseInt(getUrlParam('agents',9),10);
 			for (var i=0; i<NUM_AGENTS; i++) {
 				var angle = i * (2*Math.PI) / NUM_AGENTS;
 				var x = Math.random()*(w-100)-(w-50)/2;
@@ -250,6 +275,7 @@
 		}
 
 		$(document).ready(function() {
+			run();
 			$('#board').click(function(e){
 	    	var x = e.clientX
 	      	, y = e.clientY;
