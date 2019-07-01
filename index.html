@@ -4,6 +4,7 @@
 	<script type="text/javascript" src="lib/agent.js"></script>
 	<script type="text/javascript" src="lib/kdtree.js"></script>
 	<script type="text/javascript" src="lib/simulator.js"></script>
+	<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
 	<title>Simulator</title>
 
 	<style type="text/css">
@@ -35,7 +36,7 @@
     </style>
 </head>
 <body>
-	<canvas id="board" width="500" height="500">
+	<canvas id="board" width="800" height="800">
 		Your browser does not support canvas.  Please use a modern browser with HTML5 support.
 	</canvas>
 
@@ -50,15 +51,8 @@
 		<label for="agents"># agents</label>
 		<input type="text" name="agents" id="agents" value="9" />
 
-		<label for="radius">agent radius</label>
-		<input type="text" name="radius" id="radius" value="20" />
-
 		<input type="checkbox" name="obstacles" id="obstacles"> add obstacle (experimental)
 		<br /><br />
-
-		<label for="speed">simulation speed</label>
-		<input type="range" min="0.1" max="1.0" step="0.1" value="0.3" name="speed" id="speed"/>
-		<br />
 
 		<input type="button" value="start new simulation >>" id="run" onclick="run()">
 
@@ -73,9 +67,11 @@
 	<a href="http://guidogarcia.net">guidogarcia.net</a> - <a href="https://github.com/palmerabollo/rvo2-js">rvo2-js project at github</a>
 
 	<script type="text/javascript">
-		$ = function(id) {
-			return document.getElementById(id);
-		};
+
+		var dict = ["crab", "dolphin", "elephant", "fish",  "flamingo", "frog", "hen", "monkey", "seal", "snake", "squid", "squirrel", "toucan", "walrus", "whale"]
+		var target = 0
+		var testFlag = false;
+		var clicks = 0;
 
 		var Board = function() {
 			var canvas = document.getElementById('board');
@@ -101,28 +97,13 @@
 
 			this.drawAgents = function(simulator) {
 				var numAgents = simulator.getNumAgents();
-
 				for (var i=0; i<numAgents; i++) {
-					ctx.fillStyle = "red";
+					var img = new Image();
+					img.src = "images/".concat(dict[i]).concat(".png");
 
 					var pos = simulator.getAgentPosition(i);
 					var radius = simulator.getAgentRadius(i);
-					ctx.beginPath();
-					ctx.arc(pos.x + w/2 - 2, pos.y + h/2 - 2, radius, 0, Math.PI * 2, true);
-					ctx.fill();
-				}
-			};
-
-			this.drawGoals = function(simulator) {
-				ctx.strokeStyle = "rgb(200,200,200)";
-
-				var numAgents = simulator.getNumAgents();
-				for (var i=0; i<numAgents; i++) {
-					var pos = simulator.getGoal(i);
-					var radius = simulator.getAgentRadius(i);
-					ctx.beginPath();
-					ctx.arc(pos.x + w/2 - 2, pos.y + h/2 - 2, radius, 0, Math.PI * 2, true);
-					ctx.stroke();
+					ctx.drawImage(img, pos.x+w/2-30,pos.y+h/2-30,60, 60);
 				}
 			};
 
@@ -130,7 +111,7 @@
 				this.reset();
 				this.drawObstacles(simulator);
 				this.drawAgents(simulator);
-				this.drawGoals(simulator);
+				//this.drawGoals(simulator);
 			}
 
 			this.reset = function() {
@@ -139,13 +120,18 @@
 		}
 
 		var setPreferredVelocities = function(simulator) {
+			var canvas = document.getElementById('board');
+			var ctx = canvas.getContext('2d');
+			var w = canvas.width;
+			var h = canvas.height;
+
 			var stopped = 0;
 			for (var i = 0; i < simulator.getNumAgents (); ++i) {
         //console.log(RVOMath.absSq(simulator.getGoal(i).minus(simulator.getAgentPosition(i))));
-        if (RVOMath.absSq(simulator.getGoal(i).minus(simulator.getAgentPosition(i))) < 1000) {
+        if (RVOMath.absSq(simulator.getGoal(i).minus(simulator.getAgentPosition(i))) < 100) {
 					// Agent is within three radii of its goal, change goal
-          new_x = Math.random()*400-200;
-          new_y = Math.random()*400-200;
+          new_x = Math.random()*(w-100)-(w-50)/2;
+          new_y = Math.random()*(h-100)-(h-50)/2;
           simulator.setGoal(i,new Vector2(new_x,new_y));
         }
         simulator.setAgentPrefVelocity(i, RVOMath.normalize (simulator.getGoal(i).minus(simulator.getAgentPosition(i))));
@@ -155,13 +141,18 @@
 
 		var setupScenario = function(simulator)
 		{
+			var canvas = document.getElementById('board');
+			var ctx = canvas.getContext('2d');
+			var w = canvas.width;
+			var h = canvas.height;
+
 			// Specify global time step of the simulation.
-			var speed = new Number(.2);
+			var speed = new Number(.4);
 			simulator.setTimeStep(speed);
 
 			// Specify default parameters for agents that are subsequently added.
 			var velocity = new Vector2(1, 1);
-			var radius = new Number($("radius").value); // TODO validate
+			var radius = 40; // TODO validate
 			simulator.setAgentDefaults(
 					400, // neighbor distance (min = radius * radius)
 					30, // max neighbors
@@ -171,25 +162,27 @@
 					10.0, // max speed
 					velocity // default velocity
 				);
-			var NUM_AGENTS = $("agents").value;
+			var NUM_AGENTS = $("#agents").val();
 			for (var i=0; i<NUM_AGENTS; i++) {
 				var angle = i * (2*Math.PI) / NUM_AGENTS;
-				var x = Math.cos(angle) * 200;
-				var y = Math.sin(angle) * 200;
+				var x = Math.random()*(w-100)-(w-50)/2;
+				var y = Math.random()*(h-100)-(h-50)/2;
 				simulator.addAgent(new Vector2 (x,y));
  			}
 
 			// Create goals
 			var goals = [];
 			for (var i = 0; i < simulator.getNumAgents (); ++i) {
-				goals.push(simulator.getAgentPosition(i).scale(-1));
+				var x = Math.random()*(w-100)-(w-50)/2;
+				var y = Math.random()*(h-100)-(h-50)/2;
+				goals.push(new Vector2 (x,y));
 			}
 			simulator.addGoals(goals);
 
 			// Add (polygonal) obstacle(s), specifying vertices in counterclockwise order.
 			var vertices = [];
 
-			if ($("obstacles").checked) {
+			if ($("#obstacles").checked) {
 				for (var i=0; i<3; i++) {
 					var angle = i * (2*Math.PI) / 3;
 					var x = Math.cos(angle) * 50;
@@ -197,6 +190,10 @@
 					vertices.push(new Vector2(x,y));
 	 			}
 			}
+
+			target = Math.floor(Math.random() * (NUM_AGENTS-1));
+			testFlag = false;
+			clicks = 0;
 
 			simulator.addObstacle (vertices);
 
@@ -210,33 +207,98 @@
 		var interval;
 		var run = function() {
 			simulator = Simulator.instance = new Simulator(); // not a real singleton (TODO)
+			simulator.limit = (Math.random()*13+7)*1000;
 			clearInterval(interval);
 			board.reset();
 			setupScenario(simulator);
-
+			var d_1 = new Date();
+			start = d_1.getTime();
 			var step = function() {
+				var d_2 = new Date();
 				setPreferredVelocities(simulator);
 				simulator.run();
 				board.draw(simulator);
 
-				if (simulator.reachedGoal()) {
+				if (d_2.getTime() - start > simulator.limit) {
 					clearInterval(interval);
+					test();
 				}
 			}
 
 			interval = setInterval(step, 5);
 		}
+		var test = function()
+		{
+			var canvas = document.getElementById('board');
+			var ctx = canvas.getContext('2d');
+			var w = canvas.width;
+			var h = canvas.height;
 
+			var numAgents = simulator.getNumAgents();
+			for (var i=0; i<numAgents; i++) {
+				ctx.fillStyle = "red";
+
+				var pos = simulator.getAgentPosition(i);
+				var radius = simulator.getAgentRadius(i);
+				ctx.beginPath();
+				ctx.arc(pos.x + w/2, pos.y + h/2, radius, 0, Math.PI * 2, true);
+				ctx.fill();
+			}
+			ctx.font = "30px Arial";
+			ctx.fillText("Click on the ".concat(dict[target]), w/2, 30);
+			testFlag = true;
+		}
+
+		$(document).ready(function() {
+			$('#board').click(function(e){
+	    	var x = e.clientX
+	      	, y = e.clientY;
+
+				if(testFlag)
+				{
+					var canvas = document.getElementById('board');
+					var ctx = canvas.getContext('2d');
+					var w = canvas.width;
+					var h = canvas.height;
+					var numAgents = simulator.getNumAgents();
+					for (var i=0; i<numAgents; i++) {
+						pos = simulator.getAgentPosition(i);
+						dist = Math.sqrt(Math.pow((x-w/2)-pos.x,2) + Math.pow((y-h/2)-pos.y,2));
+						if(dist <= simulator.getAgentRadius(i))
+						{
+							clicks++;
+							if(target == i)
+							{
+								console.log("You got it in ".concat(clicks).concat(" clicks!"));
+								run();
+								testFlag = false;
+							}
+							else {
+								ctx.fillStyle = "white";
+								var radius = simulator.getAgentRadius(i)+10;
+								ctx.beginPath();
+								ctx.arc(pos.x + w/2, pos.y + h/2, radius, 0, Math.PI * 2, true);
+								ctx.fill();
+
+								var img = new Image();
+								img.src = "images/".concat(dict[i]).concat(".png");
+								ctx.drawImage(img, pos.x+w/2-30,pos.y+h/2-30,60, 60);
+							}
+						}
+					}
+				}
+	  	});
+		});
 		var dump = function() {
-			$("dump_area").innerHTML = "";
+			$("#dump_area").innerHTML = "";
 			if (simulator && simulator.agents.length) {
 				for (var i=0; i<simulator.agents.length; i++) {
-					$("dump_area").innerHTML += "<b>AGENT " + i + "</b>" +
+					$("#dump_area").innerHTML += "<b>AGENT " + i + "</b>" +
 						" <b>position</b> => " + simulator.agents[i].position.x.toFixed(3) + "," + simulator.agents[i].position.y.toFixed(3) +
 						" <b>dir</b> => " + simulator.agents[i].velocity.x.toFixed(3) + "," + simulator.agents[i].velocity.y.toFixed(3) + "<br />";
 				}
 			} else {
-				$("dump_area").innerHTML += "No agent info was found. Please start a simulation.";
+				$("#dump_area").innerHTML += "No agent info was found. Please start a simulation.";
 			}
 		}
 
