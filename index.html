@@ -1,11 +1,11 @@
 <html>
 <head>
-	<script type="text/javascript" src="https://devrathiyer.github.io/MOAT/lib/common.js"></script>
-	<script type="text/javascript" src="https://devrathiyer.github.io/MOAT/lib/agent.js"></script>
-	<script type="text/javascript" src="https://devrathiyer.github.io/MOAT/lib/kdtree.js"></script>
-	<script type="text/javascript" src="https://devrathiyer.github.io/MOAT/lib/simulator.js"></script>
+	<script type="text/javascript" src="lib/common.js"></script>
+	<script type="text/javascript" src="lib/agent.js"></script>
+	<script type="text/javascript" src="lib/kdtree.js"></script>
+	<script type="text/javascript" src="lib/simulator.js"></script>
 	<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
-
+	<script type="text/javascript" src="lib/main.js"></script>
 	<title>Simulator</title>
 
 	<style type="text/css">
@@ -37,7 +37,7 @@
     </style>
 </head>
 <body>
-	<canvas id="board" width="800" height="800">
+	<canvas id="board" width="600" height="600">
 		Your browser does not support canvas.  Please use a modern browser with HTML5 support.
 	</canvas>
 
@@ -49,29 +49,14 @@
 		reciprocal collision avoidance (ORCA) formalism.
 		</p>
 
-		<label for="agents"># agents</label>
-		<input type="text" name="agents" id="agents" value="9" />
-
-		<input type="checkbox" name="obstacles" id="obstacles"> add obstacle (experimental)
-		<br /><br />
-
-		<input type="button" value="start new simulation >>" id="run" onclick="run()">
-
-		<input type="button" value="debug info" id="dump" onclick="dump()">
-
-		<p id="dump_area">
-		</p>
+		<input type="button" value="Start!" id="run" onclick="run()">
 	</div>
 
 	<div id="TurkFormDiv">
 		<form url="https://workersandbox.mturk.com/mturk/externalSubmit" method="POST">
-			<input type = "hidden" id="Flag" value="HelloWorld">
+			<input type = "hidden" id="clicks" value="6">
 		</form>
 	</div>
-
-	<div class="clearfix"></div>
-
-	<a href="http://guidogarcia.net">guidogarcia.net</a> - <a href="https://github.com/palmerabollo/rvo2-js">rvo2-js project at github</a>
-	<script type="text/javascript" src="https://devrathiyer.github.io/MOAT/lib/main.js"></script>
+	<script type="text/javascript" src="lib/main.js"></script>
 </body>
 </html>
