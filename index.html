@@ -10,9 +10,14 @@
 
 	<style type="text/css">
       canvas {
+				padding-left: 0;
+    		padding-right: 0;
+				margin-left: auto;
+    		margin-right: auto;
+				display: block;
       	border: 1px dotted gray;
-      	float: left;
-      	margin-right: 2em;
+				width:100%;
+				height: 95vh;
       }
 
       label {
@@ -37,22 +42,9 @@
     </style>
 </head>
 <body>
-	<canvas id="board" width="600" height="600">
+	<canvas id="board">
 		Your browser does not support canvas.  Please use a modern browser with HTML5 support.
 	</canvas>
-
-	<div id="params">
-		<p id="intro">
-		Algorithm for interactive navigation and planning of large numbers of agents in two-dimensional (crowded) environments.
-		<br/>
-		At runtime, each agent senses the environment independently and computes a collision-free motion based on the optimal
-		reciprocal collision avoidance (ORCA) formalism.
-
-		the assignment id is: <b id="assignmentID"></b>
-		</p>
-		<input type="button" value="Start!" id="run" onclick="run()">
-	</div>
-
 	<div id="TurkFormDiv">
 		<form id="TurkForm" method="POST">
 			<input type = "hidden" id="clicks" value="6">
