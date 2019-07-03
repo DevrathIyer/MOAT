@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ExternalQuestion xmlns="http://mechanicalturk.amazonaws.com/AWSMechanicalTurkDataSchemas/2006-07-14/ExternalQuestion.xsd">
+  <ExternalURL>https://devrathiyer.github.io/MOAT/?agents=5&exper=1&prac=0</ExternalURL>
+  <FrameHeight>0</FrameHeight>
+</ExternalQuestion>
+
+
+mturk create-hit --question="<?xml version='1.0' encoding='UTF-8'?> <ExternalQuestion xmlns='http://mechanicalturk.amazonaws.com/AWSMechanicalTurkDataSchemas/2006-07-14/ExternalQuestion.xsd'> <ExternalURL>https://devrathiyer.github.io/MOAT/?agents=5&amp;exper=1&amp;prac=0</ExternalURL> <FrameHeight>0</FrameHeight> </ExternalQuestion>" --endpoint-url="https://mturk-requester-sandbox.us-east-1.amazonaws.com" --title="MOA 6 agent" --description="MOA 6 agent testing" --reward=5.0 --lifetime_in_seconds=6000 --asignment-duration-in-seconds=600
